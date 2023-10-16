@@ -4,7 +4,7 @@ import {
   collection,
   addDoc,
   getDoc,
-  QuerySnapshot,
+  querySnapshot,
   query,
   onSnapshot,
   deleteDoc,
@@ -62,8 +62,7 @@ export default function Page() {
   // add item to database
   const addItem = async (e) => {
     e.preventDefault();
-    if (newItem.name !== "" && newItem.image !== "") {
-      // setItems([...items, newItem]);
+    if (newItem.name !== "") {
       await addDoc(collection(db, "items"), {
         name: newItem.name.trim(),
         image: newItem.image,
@@ -96,105 +95,180 @@ export default function Page() {
         <MainHeading>Products</MainHeading>
         <FlexCol>
           <Card>
-            <FlexCol>
-              <SubHeading>Add Product</SubHeading>
-              <form>
-                <FlexCol>
-                  <input
-                    value={newItem.name}
-                    onChange={(e) =>
-                      setNewItem({ ...newItem, name: e.target.value })
-                    }
-                    className="text-sm border w-full px-5 py-2.5 rounded-md"
-                    type="text"
-                    placeholder="Product Name"
-                  />
-                  <input
-                    value={newItem.image}
-                    onChange={(e) =>
-                      setNewItem({ ...newItem, image: e.target.value })
-                    }
-                    className="text-sm border w-full px-5 py-2.5 rounded-md"
-                    type="text"
-                    placeholder="Product Image"
-                  />
-                  <div className="grid grid-cols-3 gap-2">
-                    <input
-                      className="text-sm border w-full px-5 py-2.5 rounded-md col-span-2"
-                      type="text"
-                      placeholder="Ingredient"
-                    />
-                    <input
-                      className="text-sm border w-full px-5 py-2.5 rounded-md"
-                      type="number"
-                      placeholder="Quantity"
-                    />
-                  </div>
-                  <button className="text-xs flex items-center gap-2 self-center">
-                    <AiFillPlusCircle className="text-3xl text-slate-600" />
-                    <span className="text-slate-600">Add ingredient</span>
-                  </button>
-                  <button
-                    onClick={addItem}
-                    className="rounded-md px-5 py-2.5 text-white text-center text-xs bg-red-500"
-                  >
-                    Save
-                  </button>
-                </FlexCol>
-              </form>
-            </FlexCol>
+            <Disclosure>
+              <FlexCol>
+                <Disclosure.Button className="flex justify-between items-center">
+                  <SubHeading>Add Product</SubHeading>
+                  <AiOutlineRight className="ml-auto ui-open:rotate-90 ui-open:transform" />
+                </Disclosure.Button>
+                <Disclosure.Panel>
+                  <form>
+                    <FlexCol>
+                      <input
+                        value={newItem.name}
+                        onChange={(e) =>
+                          setNewItem({ ...newItem, name: e.target.value })
+                        }
+                        className="text-sm border w-full px-5 py-2.5 rounded-md"
+                        type="text"
+                        placeholder="Name"
+                      />
+                      <input
+                        value={newItem.image}
+                        onChange={(e) =>
+                          setNewItem({ ...newItem, image: e.target.value })
+                        }
+                        className="text-sm border w-full px-5 py-2.5 rounded-md"
+                        type="text"
+                        placeholder="Image"
+                      />
+                      <div className="grid grid-cols-3 gap-2">
+                        <input
+                          className="text-sm border w-full px-5 py-2.5 rounded-md col-span-2"
+                          type="text"
+                          placeholder="Ingredient"
+                        />
+                        <input
+                          className="text-sm border w-full px-5 py-2.5 rounded-md"
+                          type="number"
+                          placeholder="Quantity"
+                        />
+                      </div>
+                      <button className="text-xs flex items-center gap-2 self-center">
+                        <AiFillPlusCircle className="text-3xl text-slate-600" />
+                        <span className="text-slate-600">Add ingredient</span>
+                      </button>
+                      <button
+                        onClick={addItem}
+                        className="rounded-md px-5 py-2.5 text-white text-center text-xs bg-red-500"
+                      >
+                        Save
+                      </button>
+                    </FlexCol>
+                  </form>
+                </Disclosure.Panel>
+              </FlexCol>
+            </Disclosure>
+          </Card>
+
+          <Card>
+            <Disclosure>
+              <FlexCol>
+                <Disclosure.Button className="flex justify-between items-center">
+                  <SubHeading>Add Ingredient</SubHeading>
+                  <AiOutlineRight className="ml-auto ui-open:rotate-90 ui-open:transform" />
+                </Disclosure.Button>
+                <Disclosure.Panel>
+                  <form>
+                    <FlexCol>
+                      <input
+                        value={newItem.name}
+                        onChange={(e) =>
+                          setNewItem({ ...newItem, name: e.target.value })
+                        }
+                        className="text-sm border w-full px-5 py-2.5 rounded-md"
+                        type="text"
+                        placeholder="Name"
+                      />
+                      <input
+                        value={newItem.name}
+                        onChange={(e) =>
+                          setNewItem({ ...newItem, name: e.target.value })
+                        }
+                        className="text-sm border w-full px-5 py-2.5 rounded-md"
+                        type="text"
+                        placeholder="Price"
+                      />
+                      <input
+                        value={newItem.image}
+                        onChange={(e) =>
+                          setNewItem({ ...newItem, image: e.target.value })
+                        }
+                        className="text-sm border w-full px-5 py-2.5 rounded-md"
+                        type="text"
+                        placeholder="Image"
+                      />
+                       <input
+                        value={newItem.image}
+                        onChange={(e) =>
+                          setNewItem({ ...newItem, image: e.target.value })
+                        }
+                        className="text-sm border w-full px-5 py-2.5 rounded-md"
+                        type="text"
+                        placeholder="Quantity per pack"
+                      />
+                      <button
+                        // onClick={addItem}
+                        className="rounded-md px-5 py-2.5 text-white text-center text-xs bg-red-500"
+                      >
+                        Save
+                      </button>
+                    </FlexCol>
+                  </form>
+                </Disclosure.Panel>
+              </FlexCol>
+            </Disclosure>
           </Card>
 
           <Card>
             <SubHeading>Products</SubHeading>
             <ul className="flex flex-col gap-2 mt-4">
-              {items.map((item, index) => {
-                return (
-                  <li
-                    key={index}
-                    className="flex flex-col items-start gap-2 bg-slate-100 p-2 rounded-md"
-                  >
-                    <Disclosure>
-                      <Disclosure.Button className="flex items-center justify-start gap-2 w-full">
-                        <img
-                          className="rounded-md w-12 h-12 object-cover"
-                          src={item.image}
-                        />
-                        <span className="p-2 inline text-sm text-slate-700 font-bold">
-                          {item.name}
-                        </span>
-                        <AiOutlineRight className="ml-auto ui-open:rotate-90 ui-open:transform" />
-                      </Disclosure.Button>
-                      <Disclosure.Panel className="w-full rounded-md flex flex-col justify-end">
-                        <div className="flex flex-col gap-2 border-y p-2 my-2">
-                          <span>Ingredients:</span>
-                          <ul className="text-xs flex flex-col gap-1 text-slate-700">
-                            {ingredients.map((ingredient, id) => {
-                              return (
-                                <li className="flex justify-between" key={id}>
-                                  <span>{ingredient.name}</span>
-                                  <span className="font-bold">
-                                    {ingredient.quantity}ml
-                                  </span>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                        <div className="flex self-end gap-2">
-                          <Button label="Edit" secondary={false} />
-                          <button
-                            onClick={() => deleteItem(item.id)}
-                            className="rounded-md px-5 py-2.5 text-white text-center text-xs bg-slate-500"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </Disclosure.Panel>
-                    </Disclosure>
-                  </li>
-                );
-              })}
+              {!items
+                ? "loading"
+                : items.map((item, index) => {
+                    return (
+                      <li
+                        key={index}
+                        className="flex flex-col items-start gap-2 bg-slate-100 p-2 rounded-md"
+                      >
+                        <Disclosure>
+                          <Disclosure.Button className="flex items-center justify-start gap-2 w-full">
+                            <img
+                              className="rounded-md w-12 h-12 object-cover"
+                              src={
+                                item.image
+                                  ? item.image
+                                  : "https://placehold.co/48x48"
+                              }
+                            />
+                            <span className="p-2 inline text-sm text-slate-700 font-bold">
+                              {item.name}
+                            </span>
+                            <AiOutlineRight className="ml-auto ui-open:rotate-90 ui-open:transform" />
+                          </Disclosure.Button>
+                          <Disclosure.Panel className="w-full rounded-md flex flex-col justify-end">
+                            <div className="flex flex-col gap-2 border-y p-2 my-2">
+                              <span>Ingredients:</span>
+                              <ul className="text-xs flex flex-col gap-1 text-slate-700">
+                                {ingredients.map((ingredient, id) => {
+                                  return (
+                                    <li
+                                      className="flex justify-between"
+                                      key={id}
+                                    >
+                                      <span>{ingredient.name}</span>
+                                      <span className="font-bold">
+                                        {ingredient.quantity}ml
+                                      </span>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </div>
+                            <div className="flex self-end gap-2">
+                              <Button label="Edit" secondary={false} />
+                              <button
+                                onClick={() => deleteItem(item.id)}
+                                className="rounded-md px-5 py-2.5 text-white text-center text-xs bg-slate-500"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </Disclosure.Panel>
+                        </Disclosure>
+                      </li>
+                    );
+                  })}
             </ul>
           </Card>
         </FlexCol>

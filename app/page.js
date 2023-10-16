@@ -1,4 +1,17 @@
 "use client";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  collection,
+  addDoc,
+  getDoc,
+  querySnapshot,
+  query,
+  onSnapshot,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "./firebase";
 import { Disclosure } from "@headlessui/react";
 import { AiOutlineRight } from "react-icons/ai";
 import Padded from "./layout/padded";
@@ -8,29 +21,51 @@ import MainHeading from "./layout/main-heading";
 import SubHeading from "./layout/sub-heading";
 
 export default function Home() {
-  let products = [
+  const [items, setItems] = useState([]);
+
+  const [ingredients, setIngredients] = useState([
     {
-      name: "Caffe Latte",
-      url: "/caffe-latte",
-      sales: 29,
-      image:
-        "https://neurosciencenews.com/files/2023/06/coffee-brain-caffeine-neuroscincces.jpg",
+      name: "Espresso Concentrate",
+      url: "/",
+      image: "https://easybrandph.com/wp-content/uploads/2022/03/coffee.png",
+      quantity: 1540,
     },
     {
-      name: "Salted Caramel",
-      url: "/salted-caramel",
-      sales: 54,
+      name: "Milk Essence",
+      url: "/",
       image:
-        "https://www.starbucksathome.com/ca/sites/default/files/styles/recipe_ingredient/public/2021-03/Salted%20Caramel%20Coffee%20Chiller_0.jpg?itok=P9I2wFGu",
+        "https://easybrandph.com/wp-content/uploads/2022/04/New-Yellow-Foil-Pack-Milk-Essence.png",
+      quantity: 2130,
     },
     {
-      name: "Coffee Matcha",
-      url: "/coffee-matcha",
-      sales: 21,
+      name: "Salted Caramel Syrup",
+      url: "/",
       image:
-        "https://www.siftandsimmer.com/wp-content/uploads/2021/03/matcha-espresso-fusion1.jpg",
+        "https://down-ph.img.susercontent.com/file/d147b7b54102af6c6ae391f442f5d72f",
+      quantity: 890,
     },
-  ];
+    {
+      name: "Sweetener",
+      url: "/",
+      image:
+        "https://down-ph.img.susercontent.com/file/ph-11134207-7qukz-lh9xwrpu68rqd0",
+      quantity: 870,
+    },
+  ]);
+
+  // read items from database
+  useEffect(() => {
+    const q = query(collection(db, "items"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let itemsArr = [];
+
+      querySnapshot.forEach((doc) => {
+        itemsArr.push({ ...doc.data(), id: doc.id });
+      });
+      setItems(itemsArr);
+    });
+  }, []);
+
   return (
     <Padded>
       <FlexCol>
@@ -38,24 +73,26 @@ export default function Home() {
         <Card>
           <SubHeading>Sales</SubHeading>
           <ul className="flex flex-col gap-2 mt-4">
-            {products.map(function (product, index) {
+            {items.map(function (item, id) {
               return (
                 <li
-                  key={index}
+                  key={id}
                   className="flex flex-col items-start gap-2 p-2 rounded-md"
                 >
                   <Disclosure>
                     <Disclosure.Button className="flex items-center justify-start gap-2 w-full">
                       <img
                         className="rounded-md w-12 h-12 object-cover"
-                        src={product.image}
+                        src={
+                          item.image ? item.image : "https://placehold.co/48x48"
+                        }
                       />
                       <span className="p-2 inline text-sm text-slate-700 font-bold">
-                        {product.name}
+                        {item.name}
                       </span>
 
                       <span className="font-bold text-sm text-slate-600">
-                        x{product.sales}
+                        {/* x{item.sales} */}
                       </span>
                       <AiOutlineRight className="ml-auto ui-open:rotate-90 ui-open:transform" />
                     </Disclosure.Button>
@@ -65,6 +102,35 @@ export default function Home() {
                       </button>
                     </Disclosure.Panel>
                   </Disclosure>
+                </li>
+              );
+            })}
+          </ul>
+        </Card>
+
+        <Card>
+          <SubHeading>Remaining Ingredients</SubHeading>
+          <ul className="flex flex-col gap-2 mt-4">
+            {ingredients.map(function (ingredient, id) {
+              return (
+                <li className="flex justify-between items-center" key={id}>
+                  <img
+                    className="rounded-md w-12 h-12 object-cover"
+                    src={
+                      ingredient.image
+                        ? ingredient.image
+                        : "https://placehold.co/48x48"
+                    }
+                  />
+                  <Link
+                    className="p-2 w-full block text-xs text-slate-700 font-bold"
+                    href={ingredient.url}
+                  >
+                    {ingredient.name}
+                  </Link>
+                  <span className="text-xs font-bold text-slate-600">
+                    {ingredient.quantity}ml
+                  </span>
                 </li>
               );
             })}
