@@ -29,35 +29,13 @@ export default function Page() {
     url: "",
   });
 
-  const [ingredients, setIngredients] = useState([
-    {
-      name: "Espresso Concentrate",
-      url: "/",
-      image: "https://easybrandph.com/wp-content/uploads/2022/03/coffee.png",
-      quantity: 20,
-    },
-    {
-      name: "Milk Essence",
-      url: "/",
-      image:
-        "https://easybrandph.com/wp-content/uploads/2022/04/New-Yellow-Foil-Pack-Milk-Essence.png",
-      quantity: 180,
-    },
-    {
-      name: "Salted Caramel Syrup",
-      url: "/",
-      image:
-        "https://down-ph.img.susercontent.com/file/d147b7b54102af6c6ae391f442f5d72f",
-      quantity: 7,
-    },
-    {
-      name: "Sweetener",
-      url: "/",
-      image:
-        "https://down-ph.img.susercontent.com/file/ph-11134207-7qukz-lh9xwrpu68rqd0",
-      quantity: 20,
-    },
-  ]);
+  const [ingredients, setIngredients] = useState([]);
+  const [newIngredient, setNewIngredient] = useState({
+    name: "",
+    price: "",
+    image: "",
+    quantityPack: "",
+  });
 
   // add item to database
   const addItem = async (e) => {
@@ -88,6 +66,38 @@ export default function Page() {
   const deleteItem = async (id) => {
     await deleteDoc(doc(db, "items", id));
   };
+
+  // add ingredients to database
+  const addIngredient = async (e) => {
+    e.preventDefault();
+    if (newIngredient.name !== "") {
+      await addDoc(collection(db, "ingredients"), {
+        name: newIngredient.name.trim(),
+        price: newIngredient.price,
+        image: newIngredient.image,
+        quantityPack: newIngredient.quantityPack,
+      });
+      setNewIngredient({ name: "", price: "", image: "", quantityPack: "" });
+    }
+  };
+
+  // delete items from database
+  const deleteIngredient = async (id) => {
+    await deleteDoc(doc(db, "ingredients", id));
+  };
+
+  // read ingredients from database
+  useEffect(() => {
+    const q = query(collection(db, "ingredients"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let ingredientsArr = [];
+
+      querySnapshot.forEach((doc) => {
+        ingredientsArr.push({ ...doc.data(), id: doc.id });
+      });
+      setIngredients(ingredientsArr);
+    });
+  }, []);
 
   return (
     <Padded>
@@ -162,43 +172,55 @@ export default function Page() {
                   <form>
                     <FlexCol>
                       <input
-                        value={newItem.name}
+                        value={newIngredient.name}
                         onChange={(e) =>
-                          setNewItem({ ...newItem, name: e.target.value })
+                          setNewIngredient({
+                            ...newIngredient,
+                            name: e.target.value,
+                          })
                         }
                         className="text-sm border w-full px-5 py-2.5 rounded-md"
                         type="text"
                         placeholder="Name"
                       />
                       <input
-                        value={newItem.name}
+                        value={newIngredient.price}
                         onChange={(e) =>
-                          setNewItem({ ...newItem, name: e.target.value })
+                          setNewIngredient({
+                            ...newIngredient,
+                            price: e.target.value,
+                          })
                         }
                         className="text-sm border w-full px-5 py-2.5 rounded-md"
-                        type="text"
+                        type="number"
                         placeholder="Price"
                       />
                       <input
-                        value={newItem.image}
+                        value={newIngredient.image}
                         onChange={(e) =>
-                          setNewItem({ ...newItem, image: e.target.value })
+                          setNewIngredient({
+                            ...newIngredient,
+                            image: e.target.value,
+                          })
                         }
                         className="text-sm border w-full px-5 py-2.5 rounded-md"
                         type="text"
                         placeholder="Image"
                       />
-                       <input
-                        value={newItem.image}
+                      <input
+                        value={newIngredient.quantityPack}
                         onChange={(e) =>
-                          setNewItem({ ...newItem, image: e.target.value })
+                          setNewIngredient({
+                            ...newIngredient,
+                            quantityPack: e.target.value,
+                          })
                         }
                         className="text-sm border w-full px-5 py-2.5 rounded-md"
-                        type="text"
+                        type="number"
                         placeholder="Quantity per pack"
                       />
                       <button
-                        // onClick={addItem}
+                        onClick={addIngredient}
                         className="rounded-md px-5 py-2.5 text-white text-center text-xs bg-red-500"
                       >
                         Save
@@ -259,6 +281,66 @@ export default function Page() {
                               <Button label="Edit" secondary={false} />
                               <button
                                 onClick={() => deleteItem(item.id)}
+                                className="rounded-md px-5 py-2.5 text-white text-center text-xs bg-slate-500"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </Disclosure.Panel>
+                        </Disclosure>
+                      </li>
+                    );
+                  })}
+            </ul>
+          </Card>
+
+          <Card>
+            <SubHeading>Ingredients</SubHeading>
+            <ul className="flex flex-col gap-2 mt-4">
+              {!ingredients
+                ? "loading"
+                : ingredients.map((ingredient, index) => {
+                    return (
+                      <li
+                        key={index}
+                        className="flex flex-col items-start gap-2 bg-slate-100 p-2 rounded-md"
+                      >
+                        <Disclosure>
+                          <Disclosure.Button className="flex items-center justify-start gap-2 w-full">
+                            <img
+                              className="rounded-md w-12 h-12 object-cover"
+                              src={
+                                ingredient.image
+                                  ? ingredient.image
+                                  : "https://placehold.co/48x48"
+                              }
+                            />
+                            <span className="p-2 inline text-sm text-slate-700 font-bold">
+                              {ingredient.name}
+                            </span>
+                            <AiOutlineRight className="ml-auto ui-open:rotate-90 ui-open:transform" />
+                          </Disclosure.Button>
+                          <Disclosure.Panel className="w-full rounded-md flex flex-col justify-end">
+                            <div className="flex flex-col">
+                              <ul className="text-xs flex flex-col gap-2 p-2">
+                                <li>
+                                  Quantity per pack:
+                                  <span className="ml-2 font-bold">
+                                    {parseInt(ingredient.quantityPack, 10)}ml
+                                  </span>
+                                </li>
+                                <li>
+                                  Price per pack:
+                                  <span className="ml-2 font-bold">
+                                    ₱{parseInt(ingredient.price, 10)}
+                                  </span>
+                                </li>
+                              </ul>
+                            </div>
+                            <div className="flex self-end gap-2">
+                              <Button label="Edit" secondary={false} />
+                              <button
+                                onClick={() => deleteIngredient(ingredient.id)}
                                 className="rounded-md px-5 py-2.5 text-white text-center text-xs bg-slate-500"
                               >
                                 Delete

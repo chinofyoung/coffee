@@ -24,7 +24,7 @@ export default function Navigation() {
   return (
     <div className="bg-slate-900 p-4 flex items-center z-20 h-20 sticky top-0">
       <span className="flex w-full select-none justify-start font-playfair text-2xl text-slate-50">
-        <span className="font-bold">Coffee</span>Roy
+        <span className="font-bold">Pake</span>Mo
       </span>
 
       <button onClick={() => setOpenMenu(true)}>
