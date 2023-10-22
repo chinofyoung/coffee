@@ -3,25 +3,37 @@ import React, { useState, useEffect } from "react";
 import {
   collection,
   addDoc,
-  getDoc,
-  querySnapshot,
+  serverTimestamp,
   query,
   onSnapshot,
-  deleteDoc,
-  doc,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import Link from "next/link";
-import { Disclosure } from "@headlessui/react";
-import { AiOutlineRight } from "react-icons/ai";
 import Padded from "../layout/padded";
-import Card from "../layout/card";
-import FlexCol from "../layout/flex-col";
 import MainHeading from "../layout/main-heading";
 import SubHeading from "../layout/sub-heading";
+import FlexCol from "../layout/flex-col";
+import Card from "../layout/card";
 
 export default function Page() {
   const [items, setItems] = useState([]);
+  const [sales, setSales] = useState([]);
+  const [newSale, setNewSale] = useState({
+    product: "",
+    quantity: "",
+  });
+
+  // add sale to database
+  const addSale = async (e) => {
+    e.preventDefault();
+    if (newSale.product !== "" && newSale.quantity !== "") {
+      await addDoc(collection(db, "sales"), {
+        product: newSale.product,
+        quantity: newSale.quantity,
+        createdAt: serverTimestamp(),
+      });
+    }
+  };
 
   // read items from database
   useEffect(() => {
@@ -36,133 +48,114 @@ export default function Page() {
     });
   }, []);
 
-  let materials = [
-    {
-      name: "Espresso Concentrate",
-      url: "/",
-      image: "https://easybrandph.com/wp-content/uploads/2022/03/coffee.png",
-    },
-    {
-      name: "Milk Essence",
-      url: "/",
-      image:
-        "https://easybrandph.com/wp-content/uploads/2022/04/New-Yellow-Foil-Pack-Milk-Essence.png",
-    },
-    {
-      name: "Salted Caramel Syrup",
-      url: "/",
-      image:
-        "https://down-ph.img.susercontent.com/file/d147b7b54102af6c6ae391f442f5d72f",
-    },
-    {
-      name: "Sweetener",
-      url: "/",
-      image:
-        "https://down-ph.img.susercontent.com/file/ph-11134207-7qukz-lh9xwrpu68rqd0",
-    },
-    {
-      name: "Plastic Cup",
-      url: "/",
-      image: "https://m.media-amazon.com/images/I/61bvxPzxfnL.jpg",
-    },
-  ];
+  // read sales from database
+  useEffect(() => {
+    const q = query(
+      collection(db, "sales"),
+      orderBy("createdAt", "desc")
+      // limit(5)
+    );
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let salesArr = [];
+
+      querySnapshot.forEach((doc) => {
+        salesArr.push({ ...doc.data(), id: doc.id });
+      });
+      setSales(salesArr);
+    });
+  }, []);
+
+  function renderTotal() {
+    const salesLength = parseInt(sales.length);
+    var totalSales = 0;
+
+    for (let i = 0; i < salesLength; i++) {
+      totalSales = parseInt(sales[i]?.quantity) + totalSales;
+    }
+
+    return (
+      <span className="text-base text-neutral-600 font-bold">
+        {totalSales} cups sold
+      </span>
+    );
+  }
 
   return (
-    <>
-      <Card>
-        <SubHeading>Opening Inventory</SubHeading>
-        <ul className="grid grid-cols-3 gap-2 mt-4">
-          {materials.map(function (material, index) {
-            return (
-              <li
-                key={index}
-                className="flex flex-col justify-center items-center gap-2"
-              >
-                <img
-                  className="rounded-md w-12 h-12 object-cover"
-                  src={material.image}
-                />
-                <Link
-                  className="p-2 w-full block text-center text-xs text-slate-700 font-bold"
-                  href={material.url}
-                >
-                  {material.name}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </Card>
-      <Card>
-        <SubHeading>Sales</SubHeading>
-        <ul className="flex flex-col gap-2 mt-4">
-          {items.map((item, index) => {
-            return (
-              <li
-                key={index}
-                className="flex flex-col items-start gap-2 bg-slate-100 p-2 rounded-md"
-              >
-                <Disclosure>
-                  <Disclosure.Button className="flex items-center justify-start gap-2 w-full">
-                    <img
-                      className="rounded-md w-12 h-12 object-cover"
-                      src={
-                        item.image ? item.image : "https://placehold.co/48x48"
-                      }
-                    />
-                    <span className="p-2 inline text-sm text-slate-700 font-bold">
-                      {item.name}
-                    </span>
+    <Padded>
+      <FlexCol>
+        <MainHeading>Record</MainHeading>
+        <Card>
+          <SubHeading>Sales</SubHeading>
+          <div className="mt-2"></div>
+          <FlexCol>
+            <select
+              className="border rounded-md py-2.5 px-4 text-neutral-700"
+              onChange={(e) =>
+                setNewSale({ ...newSale, product: e.target.value })
+              }
+            >
+              <option value="" disabled>
+                Select a product
+              </option>
+              {!items
+                ? "loading"
+                : items.map((item, index) => {
+                    return (
+                      <option key={index} value={item.name}>
+                        {item.name}
+                      </option>
+                    );
+                  })}
+            </select>
+            <input
+              value={newSale.quantity}
+              onChange={(e) =>
+                setNewSale({ ...newSale, quantity: e.target.value })
+              }
+              className="text-sm border w-full px-5 py-2.5 rounded-md"
+              type="number"
+              placeholder="Quantity"
+            />
+            <button
+              onClick={addSale}
+              className="rounded-md px-5 py-2.5 text-white text-center text-xs bg-red-500"
+            >
+              Save
+            </button>
+          </FlexCol>
+        </Card>
 
-                    {item.sales && (
-                      <span className="font-bold text-sm text-slate-600">
-                        x{item.sales}
+        <Card>
+          <SubHeading>Total Sales</SubHeading>
+          {renderTotal()}
+        </Card>
+
+        <Card>
+          <SubHeading>Sold Items</SubHeading>
+          <ul className="text-xs flex flex-col gap-1 text-slate-700 mt-2">
+            {!sales
+              ? "loading"
+              : sales.map((sale, index) => {
+                  return (
+                    <li
+                      className="flex justify-between items-start gap-2 bg-slate-100 p-2 rounded-md"
+                      key={index}
+                    >
+                      <div className="flex gap-2">
+                        <span>{sale.product}</span>
+                        <span className="font-bold">x{sale.quantity}</span>
+                      </div>
+                      <span className="ml-2 font-bold">
+                        {new Date(
+                          sale?.createdAt?.seconds * 1000
+                        ).toLocaleDateString("en-US")}
                       </span>
-                    )}
-                    <AiOutlineRight className="ml-auto ui-open:rotate-90 ui-open:transform" />
-                  </Disclosure.Button>
-                  <Disclosure.Panel className="w-full rounded-md flex justify-end">
-                    <div className="grid grid-cols-3 gap-4">
-                      <input
-                        className="text-sm border w-full px-5 py-2.5 rounded-md col-span-2"
-                        type="text"
-                        placeholder="Sales"
-                      />
-                      <button className="py-1 px-5 text-sm text-white rounded-md bg-red-400">
-                        Save
-                      </button>
-                    </div>
-                  </Disclosure.Panel>
-                </Disclosure>
-              </li>
-            );
-          })}
-        </ul>
-      </Card>
-      <Card>
-        <SubHeading>Leftover</SubHeading>
-        <ul className="grid grid-cols-3 gap-2 mt-4">
-          {materials.map(function (material, index) {
-            return (
-              <li
-                key={index}
-                className="flex flex-col justify-center items-center gap-2"
-              >
-                <img
-                  className="rounded-md w-12 h-12 object-cover"
-                  src={material.image}
-                />
-                <Link
-                  className="p-2 w-full block text-center text-xs text-slate-700 font-bold"
-                  href={material.url}
-                >
-                  {material.name}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </Card>
-    </>
+                    </li>
+                  );
+                })}
+          </ul>
+        </Card>
+      </FlexCol>
+    </Padded>
   );
 }

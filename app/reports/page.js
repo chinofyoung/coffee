@@ -7,7 +7,6 @@ import {
   query,
   onSnapshot,
   orderBy,
-  limit,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import Padded from "../layout/padded";
@@ -15,8 +14,6 @@ import MainHeading from "../layout/main-heading";
 import SubHeading from "../layout/sub-heading";
 import FlexCol from "../layout/flex-col";
 import Card from "../layout/card";
-import { Combobox, Transition } from "@headlessui/react";
-import { HiMiniChevronUpDown, HiCheck } from "react-icons/hi2";
 
 export default function Page() {
   const [items, setItems] = useState([]);
@@ -98,47 +95,8 @@ export default function Page() {
         <MainHeading>Reports</MainHeading>
         <Card>
           <SubHeading>Summary</SubHeading>
-          <FlexCol>
-            <select
-              className="border rounded-md py-2.5 px-4 text-neutral-700"
-              onChange={(e) =>
-                setNewSale({ ...newSale, product: e.target.value })
-              }
-            >
-              <option value="" disabled>
-                Select a product
-              </option>
-              {!items
-                ? "loading"
-                : items.map((item, index) => {
-                    return (
-                      <option key={index} value={item.name}>
-                        {item.name}
-                      </option>
-                    );
-                  })}
-            </select>
-            <input
-              value={newSale.quantity}
-              onChange={(e) =>
-                setNewSale({ ...newSale, quantity: e.target.value })
-              }
-              className="text-sm border w-full px-5 py-2.5 rounded-md"
-              type="number"
-              placeholder="Quantity"
-            />
-            <button
-              onClick={addSale}
-              className="rounded-md px-5 py-2.5 text-white text-center text-xs bg-red-500"
-            >
-              Save
-            </button>
-          </FlexCol>
-        </Card>
-
-        <Card>
-          <SubHeading>Total Sales</SubHeading>
-          {renderTotal()}
+            <SubHeading>Total Sales</SubHeading>
+            {renderTotal()}
         </Card>
 
         <Card>
