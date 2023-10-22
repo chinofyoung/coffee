@@ -101,7 +101,6 @@ export default function Page() {
           <FlexCol>
             <select
               className="border rounded-md py-2.5 px-4 text-neutral-700"
-              value=""
               onChange={(e) =>
                 setNewSale({ ...newSale, product: e.target.value })
               }
