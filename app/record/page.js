@@ -68,108 +68,101 @@ export default function Page() {
   ];
 
   return (
-    <Padded>
-      <FlexCol>
-        <MainHeading>Add Record</MainHeading>
-        <FlexCol>
-          <Card>
-            <SubHeading>Opening Inventory</SubHeading>
-            <ul className="grid grid-cols-3 gap-2 mt-4">
-              {materials.map(function (material, index) {
-                return (
-                  <li
-                    key={index}
-                    className="flex flex-col justify-center items-center gap-2"
-                  >
+    <>
+      <Card>
+        <SubHeading>Opening Inventory</SubHeading>
+        <ul className="grid grid-cols-3 gap-2 mt-4">
+          {materials.map(function (material, index) {
+            return (
+              <li
+                key={index}
+                className="flex flex-col justify-center items-center gap-2"
+              >
+                <img
+                  className="rounded-md w-12 h-12 object-cover"
+                  src={material.image}
+                />
+                <Link
+                  className="p-2 w-full block text-center text-xs text-slate-700 font-bold"
+                  href={material.url}
+                >
+                  {material.name}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </Card>
+      <Card>
+        <SubHeading>Sales</SubHeading>
+        <ul className="flex flex-col gap-2 mt-4">
+          {items.map((item, index) => {
+            return (
+              <li
+                key={index}
+                className="flex flex-col items-start gap-2 bg-slate-100 p-2 rounded-md"
+              >
+                <Disclosure>
+                  <Disclosure.Button className="flex items-center justify-start gap-2 w-full">
                     <img
                       className="rounded-md w-12 h-12 object-cover"
-                      src={material.image}
+                      src={
+                        item.image ? item.image : "https://placehold.co/48x48"
+                      }
                     />
-                    <Link
-                      className="p-2 w-full block text-center text-xs text-slate-700 font-bold"
-                      href={material.url}
-                    >
-                      {material.name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
-          <Card>
-            <SubHeading>Sales</SubHeading>
-            <ul className="flex flex-col gap-2 mt-4">
-              {items.map((item, index) => {
-                return (
-                  <li
-                    key={index}
-                    className="flex flex-col items-start gap-2 bg-slate-100 p-2 rounded-md"
-                  >
-                    <Disclosure>
-                      <Disclosure.Button className="flex items-center justify-start gap-2 w-full">
-                        <img
-                          className="rounded-md w-12 h-12 object-cover"
-                          src={
-                            item.image
-                              ? item.image
-                              : "https://placehold.co/48x48"
-                          }
-                        />
-                        <span className="p-2 inline text-sm text-slate-700 font-bold">
-                          {item.name}
-                        </span>
+                    <span className="p-2 inline text-sm text-slate-700 font-bold">
+                      {item.name}
+                    </span>
 
-                        {item.sales && (
-                          <span className="font-bold text-sm text-slate-600">
-                            x{item.sales}
-                          </span>
-                        )}
-                        <AiOutlineRight className="ml-auto ui-open:rotate-90 ui-open:transform" />
-                      </Disclosure.Button>
-                      <Disclosure.Panel className="w-full rounded-md flex justify-end">
-                        <div className="grid grid-cols-3 gap-4">
-                          <input
-                            className="text-sm border w-full px-5 py-2.5 rounded-md col-span-2"
-                            type="text"
-                            placeholder="Sales"
-                          />
-                          <button className="py-1 px-5 text-sm text-white rounded-md bg-red-400">
-                            Save
-                          </button>
-                        </div>
-                      </Disclosure.Panel>
-                    </Disclosure>
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
-          <Card>
-            <SubHeading>Leftover</SubHeading>
-            <ul className="grid grid-cols-3 gap-2 mt-4">
-              {materials.map(function (material, index) {
-                return (
-                  <li
-                    key={index}
-                    className="flex flex-col justify-center items-center gap-2"
-                  >
-                    <img
-                      className="rounded-md w-12 h-12 object-cover"
-                      src={material.image}
-                    />
-                    <Link
-                      className="p-2 w-full block text-center text-xs text-slate-700 font-bold"
-                      href={material.url}
-                    >
-                      {material.name}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </Card>
-        </FlexCol>
-      </FlexCol>
-    </Padded>
+                    {item.sales && (
+                      <span className="font-bold text-sm text-slate-600">
+                        x{item.sales}
+                      </span>
+                    )}
+                    <AiOutlineRight className="ml-auto ui-open:rotate-90 ui-open:transform" />
+                  </Disclosure.Button>
+                  <Disclosure.Panel className="w-full rounded-md flex justify-end">
+                    <div className="grid grid-cols-3 gap-4">
+                      <input
+                        className="text-sm border w-full px-5 py-2.5 rounded-md col-span-2"
+                        type="text"
+                        placeholder="Sales"
+                      />
+                      <button className="py-1 px-5 text-sm text-white rounded-md bg-red-400">
+                        Save
+                      </button>
+                    </div>
+                  </Disclosure.Panel>
+                </Disclosure>
+              </li>
+            );
+          })}
+        </ul>
+      </Card>
+      <Card>
+        <SubHeading>Leftover</SubHeading>
+        <ul className="grid grid-cols-3 gap-2 mt-4">
+          {materials.map(function (material, index) {
+            return (
+              <li
+                key={index}
+                className="flex flex-col justify-center items-center gap-2"
+              >
+                <img
+                  className="rounded-md w-12 h-12 object-cover"
+                  src={material.image}
+                />
+                <Link
+                  className="p-2 w-full block text-center text-xs text-slate-700 font-bold"
+                  href={material.url}
+                >
+                  {material.name}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </Card>
+    </>
   );
 }
