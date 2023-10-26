@@ -1,11 +1,39 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { UserAuth } from "../context/auth-context";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { AiFillCloseCircle } from "react-icons/ai";
 
-export default function Navigation() {
+const Navigation = () => {
+  const { user, googleSignIn, logOut } = UserAuth();
+  const [loading, setLoading] = useState(true);
   const [openMenu, setOpenMenu] = useState(false);
+
+  const handleSignIn = async () => {
+    try {
+      await googleSignIn();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await logOut();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      setLoading(false);
+    };
+    checkAuthentication();
+  }, [user]);
+
   let nav = [
     {
       url: "/",
@@ -37,13 +65,21 @@ export default function Navigation() {
         }`}
       >
         <div className="flex items-center justify-between border-b border-solid border-slate-200 p-4">
-          <div className="flex items-center gap-4">
-            <img
-              className="h-12 w-12 rounded-full object-cover"
-              src="https://thispersondoesnotexist.com/"
-            />
-            <span className="text-slate-600 text-sm">Hello, User!</span>
-          </div>
+          {loading ? null : user ? (
+            <div className="flex items-center gap-4">
+              <img
+                className="h-12 w-12 rounded-full object-cover"
+                src={user?.photoURL}
+              />
+              <span className="text-slate-600 text-sm">
+                Hello, {user?.displayName}!
+              </span>
+            </div>
+          ) : (
+            <span className="text-slate-600 text-sm">
+              Hello, Guest!
+            </span>
+          )}
           <button onClick={() => setOpenMenu(false)}>
             <AiFillCloseCircle className="text-3xl text-red-500" />
           </button>
@@ -62,11 +98,25 @@ export default function Navigation() {
         </ul>
 
         <div className="mt-auto w-full flex justify-center p-4 bg-slate-100">
-          <button className="bg-red-500 w-full text-sm px-4 py-2.5 text-white rounded-md">
-            Logout
-          </button>
+          {loading ? null : !user ? (
+            <button
+              onClick={handleSignIn}
+              className="bg-red-500 w-full text-sm px-4 py-2.5 text-white rounded-md"
+            >
+              Login
+            </button>
+          ) : (
+            <button
+              onClick={handleSignOut}
+              className="bg-red-500 w-full text-sm px-4 py-2.5 text-white rounded-md"
+            >
+              Logout
+            </button>
+          )}
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Navigation;
