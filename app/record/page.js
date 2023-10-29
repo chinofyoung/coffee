@@ -14,8 +14,10 @@ import MainHeading from "../layout/main-heading";
 import SubHeading from "../layout/sub-heading";
 import FlexCol from "../layout/flex-col";
 import Card from "../layout/card";
+import { UserAuth } from "../context/auth-context";
 
 export default function Page() {
+  const { user } = UserAuth();
   const [items, setItems] = useState([]);
   const [sales, setSales] = useState([]);
   const [newSale, setNewSale] = useState({
@@ -26,11 +28,12 @@ export default function Page() {
   // add sale to database
   const addSale = async (e) => {
     e.preventDefault();
-    if (newSale.product !== "" && newSale.quantity !== "") {
+    if (user && newSale.product !== "" && newSale.quantity !== "") {
       await addDoc(collection(db, "sales"), {
         product: newSale.product,
         quantity: newSale.quantity,
         createdAt: serverTimestamp(),
+        uid: user.uid,
       });
     }
   };
@@ -77,6 +80,17 @@ export default function Page() {
       <span className="text-base text-neutral-600 font-bold">
         {totalSales} cups sold
       </span>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Padded>
+        <FlexCol>
+          <MainHeading>Record</MainHeading>
+          <SubHeading>Access Denied. Please Login</SubHeading>
+        </FlexCol>
+      </Padded>
     );
   }
 
