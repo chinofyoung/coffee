@@ -15,6 +15,7 @@ import SubHeading from "../layout/sub-heading";
 import FlexCol from "../layout/flex-col";
 import Card from "../layout/card";
 import { UserAuth } from "../context/auth-context";
+import SalesRow from "./sales-row";
 
 export default function Page() {
   const { user } = UserAuth();
@@ -150,22 +151,7 @@ export default function Page() {
             {!sales
               ? "loading"
               : sales.map((sale, index) => {
-                  return (
-                    <li
-                      className="flex justify-between items-start gap-2 bg-slate-100 p-2 rounded-md"
-                      key={index}
-                    >
-                      <div className="flex gap-2">
-                        <span>{sale.product}</span>
-                        <span className="font-bold">x{sale.quantity}</span>
-                      </div>
-                      <span className="ml-2 font-bold">
-                        {new Date(
-                          sale?.createdAt?.seconds * 1000
-                        ).toLocaleDateString("en-US")}
-                      </span>
-                    </li>
-                  );
+                  return <SalesRow sale={sale} key={`sales-${index}`} />;
                 })}
           </ul>
         </Card>
